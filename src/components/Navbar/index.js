@@ -1,55 +1,64 @@
 "use client";
 
 import { GlobalContext } from "@/context";
-import { adminNavOptions, navOptions} from "@/utils";
-import { Fragment, useContext } from "react";
-import CommonModal from "../CommonModel";
+import { adminNavOptions, navOptions } from "@/utils";
+import { Fragment, useContext, useEffect } from "react";
+import CommonModal from "../CommonModal";
+const isAdminView=false;
+const isAuthUser=true;
+const user={
+  role:"admin"
+}
 
-const isAdminView = false;
-const isAuthUser = true;
-const user = {
-  role: "admin",
-};
-
-function NavItems() {
-    
-   
-
+function NavItems({ isModalView = false, isAdminView, router }) {
   return (
     <div
-      className="items-center justify-between w-full md:flex md:w-auto "
+      className={`items-center justify-between w-full md:flex md:w-auto ${
+        isModalView ? "" : "hidden"
+      }`}
       id="nav-items"
     >
-      <nav className="flex flex-col p-4 md:p-0 mt-4 font-medium border border-gray-100 rounded-lg md:flex-row md:space-x-8 md:mt-0 md:border-0 bg-white">
+      <ul
+        className={`flex flex-col p-4 md:p-0 mt-4 font-medium  rounded-lg md:flex-row md:space-x-8 md:mt-0 md:border-0 bg-white ${
+          isModalView ? "border-none" : "border border-gray-100"
+        }`}
+      >
         {isAdminView
           ? adminNavOptions.map((item) => (
               <li
-                className="cursor-pointer py-2 block pl-3 pr-4 text-gray-900 rounded md:p-0"
+                className="cursor-pointer block py-2 pl-3 pr-4 text-gray-900 rounded md:p-0"
                 key={item.id}
+                onClick={() => router.push(item.path)}
               >
                 {item.label}
               </li>
             ))
           : navOptions.map((item) => (
               <li
-                className="cursor-pointer py-2 block pl-3 pr-4 text-gray-900 rounded md:p-0"
+                className="cursor-pointer block py-2 pl-3 pr-4 text-gray-900 rounded md:p-0"
                 key={item.id}
+                onClick={() => router.push(item.path)}
               >
                 {item.label}
               </li>
             ))}
-      </nav>
+      </ul>
     </div>
   );
 }
+
 export default function Navbar() {
-    const { showNavModal, setShowNavModal } = useContext(GlobalContext);
+  const { showNavModal, setShowNavModal } = useContext(GlobalContext);
+
   return (
     <>
-      <nav className="bg-white fixed w-full z-20 top-0 left-0 bottom-0 border-b border-gray-200">
+      <nav className="bg-white fixed w-full z-20 top-0 left-0 border-b border-gray-200">
         <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-          <div className="flex items-center cursor-pointer">
-            <span className="self-center text-2xl font-semibold whitespace-nowrap">
+          <div
+            onClick={() => router.push("/")}
+            className="flex items-center cursor-pointer"
+          >
+            <span className="slef-center text-2xl font-semibold whitespace-nowrap">
               Ecommercery
             </span>
           </div>
@@ -60,6 +69,7 @@ export default function Navbar() {
                   className={
                     "mt-1.5 inline-block bg-black px-5 py-3 text-xs font-medium upprcase tracking-wide text-white"
                   }
+                  onClick={()=>router.push('/account')}
                 >
                   Account
                 </button>
@@ -67,6 +77,7 @@ export default function Navbar() {
                   className={
                     "mt-1.5 inline-block bg-black px-5 py-3 text-xs font-medium upprcase tracking-wide text-white"
                   }
+                  onClick={()=> setShowCartModal(true)}
                 >
                   Cart
                 </button>
@@ -78,11 +89,13 @@ export default function Navbar() {
                   className={
                     "mt-1.5 inline-block bg-black px-5 py-3 text-xs font-medium upprcase tracking-wide text-white"
                   }
+                  onClick={() => router.push("/")}
                 >
                   Client View
                 </button>
               ) : (
                 <button
+                  onClick={() => router.push("/admin-view")}
                   className={
                     "mt-1.5 inline-block bg-black px-5 py-3 text-xs font-medium upprcase tracking-wide text-white"
                   }
@@ -93,6 +106,7 @@ export default function Navbar() {
             ) : null}
             {isAuthUser ? (
               <button
+                
                 className={
                   "mt-1.5 inline-block bg-black px-5 py-3 text-xs font-medium upprcase tracking-wide text-white"
                 }
@@ -101,6 +115,7 @@ export default function Navbar() {
               </button>
             ) : (
               <button
+                onClick={() => router.push("/login")}
                 className={
                   "mt-1.5 inline-block bg-black px-5 py-3 text-xs font-medium upprcase tracking-wide text-white"
                 }
@@ -127,15 +142,27 @@ export default function Navbar() {
                 <path
                   fillRule="evenodd"
                   d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                  clip-rule="evenodd"
+                  clipRule="evenodd"
                 ></path>
               </svg>
             </button>
           </div>
-          <NavItems />
+          <NavItems isAdminView={isAdminView} />
         </div>
       </nav>
-      <CommonModal show={showNavModal} setShow={setShowNavModal}/>
+      <CommonModal
+        showModalTitle={false}
+        mainContent={
+          <NavItems
+            
+            isModalView={true}
+            isAdminView={isAdminView}
+          />
+        }
+        show={showNavModal}
+        setShow={setShowNavModal}
+      />
+      
     </>
   );
 }
