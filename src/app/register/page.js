@@ -3,17 +3,16 @@
 import InputComponent from "@/components/FormElements/InputComponent";
 import SelectComponent from "@/components/FormElements/SelectComponent";
 
-
 import { GlobalContext } from "@/context";
+import { registerNeWUser } from "@/servies/register";
 
 import { registrationFormControls } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
 
-
 const initialFormData = {
   name: " ",
-  email: " ", 
+  email: " ",
   password: " ",
   role: "customer",
 };
@@ -21,9 +20,10 @@ const initialFormData = {
 export default function Register() {
   const [formData, setFormData] = useState(initialFormData);
   const [isRegistered, setIsRegistered] = useState(false);
-  const { pageLevelLoader, setPageLevelLoader , isAuthUser } = useContext(GlobalContext);
+  const { pageLevelLoader, setPageLevelLoader, isAuthUser } =
+    useContext(GlobalContext);
 
-  const router = useRouter()
+  const router = useRouter();
 
   console.log(formData);
 
@@ -40,8 +40,10 @@ export default function Register() {
   }
 
   console.log(isFormValid());
-
-
+  async function handleRegisterOnSubmit(){
+    const data=await registerNeWUser(formData);
+    console.log(data)
+  }
   return (
     <div className="bg-white relative">
       <div className="flex flex-col items-center justify-between pt-0 pr-10 pb-0 pl-10 mt-8 mr-auto xl:px-5 lg:flex-row">
@@ -58,15 +60,16 @@ export default function Register() {
                   className="inline-flex w-full items-center justify-center bg-black px-6 py-4 text-lg 
                 text-white transition-all duration-200 ease-in-out focus:shadow font-medium uppercase tracking-wide
                 "
-                onClick={()=>router.push('/login')}
+                  onClick={() => router.push("/login")}
                 >
                   Login
                 </button>
               ) : (
                 <div className="w-full mt-6 mr-0 mb-0 ml-0 relative space-y-8">
-                  {registrationFormControls.map((controlItem) =>
+                  {registrationFormControls.map((controlItem, index) =>
                     controlItem.componentType === "input" ? (
                       <InputComponent
+                        key={index} // Add a unique key here
                         type={controlItem.type}
                         placeholder={controlItem.placeholder}
                         label={controlItem.label}
@@ -80,6 +83,7 @@ export default function Register() {
                       />
                     ) : controlItem.componentType === "select" ? (
                       <SelectComponent
+                        key={index} // Add a unique key here
                         options={controlItem.options}
                         label={controlItem.label}
                         onChange={(event) => {
@@ -92,12 +96,13 @@ export default function Register() {
                       />
                     ) : null
                   )}
+
                   <button
                     className=" disabled:opacity-50 inline-flex w-full items-center justify-center bg-black px-6 py-4 text-lg 
                    text-white transition-all duration-200 ease-in-out focus:shadow font-medium uppercase tracking-wide
                    "
                     disabled={!isFormValid()}
-                    
+                    onClick={handleRegisterOnSubmit}
                   >
                     Register
                   </button>
@@ -107,7 +112,6 @@ export default function Register() {
           </div>
         </div>
       </div>
-      
     </div>
   );
 }

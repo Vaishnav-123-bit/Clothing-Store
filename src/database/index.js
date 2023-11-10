@@ -1,11 +1,13 @@
 import mongoose from "mongoose";
+
 const configOptions = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 };
 
 const connectToDb = async () => {
-  const connectionUrl = "mongodb+srv://hard:hard@cluster0.sucrsem.mongodb.net/";
+  const connectionUrl =
+    "mongodb+srv://hard:hard@cluster0.sucrsem.mongodb.net/";
 
   mongoose
     .connect(connectionUrl, configOptions)

@@ -13,50 +13,56 @@ const schema = Joi.object({
 
 export const dynamic = "force-dynamic";
 
+// ... (import statements)
+
 export async function POST(req) {
-  await connectToDb();
-  const { name, email, password, role } = await req.json();
-}
+  try {
+    await connectToDb();
 
-//validate the schema
+    const { name, email, password, role } = await req.json();
 
-const { error } = schema.validate({ name, email, password, role });
+    // Validate the schema
+    const { error } = schema.validate({ name, email, password, role });
 
-if (error) {
-  return NextResponse.json({
-    sucess: False,
-    message: email.details[0],
-  });
-}
+    if (error) {
+      console.error(error);
+      return NextResponse.json({
+        success: false,
+        message: `Validation error: ${error.details[0].message}`,
+      }, 400); // Bad Request
+    }
 
-try {
-  const isUserAlreadyExists = await User.findOne({ email });
-  if (isUserAlreadyExists) {
-    return NextResponse.json({
-      sucess: false,
-      message: "user already exists | Try with another email",
-    });
-  } else {
+    // Check if the user already exists
+    const isUserAlreadyExists = await User.findOne({ email });
+
+    if (isUserAlreadyExists) {
+      return NextResponse.json({
+        success: false,
+        message: "User already exists. Please try with a different email.",
+      }, 409); // Conflict
+    }
+
+    // Hash the password and create a new user
     const hashPassword = await hash(password, 12);
-
     const newlyCreatedUser = await User.create({
       name,
       email,
       password: hashPassword,
       role,
     });
+
     if (newlyCreatedUser) {
       return NextResponse.json({
-        sucess: true,
-        message: "Account created sucessfully",
-      });
+        success: true,
+        message: "Account created successfully.",
+      }, 201); // Created
     }
-  }
-} catch (error) {
-  console.log("error in creating new user");
+  } catch (error) {
+    console.error("Error while new user registration:", error);
 
-  return NextResponse.json({
-    sucess: false,
-    message: "something went wrong | please try later ",
-  });
+    return NextResponse.json({
+      success: false,
+      message: "Something went wrong! Please try again later.",
+    }, 500); // Internal Server Error
+  }
 }
