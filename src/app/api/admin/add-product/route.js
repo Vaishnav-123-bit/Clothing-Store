@@ -48,7 +48,7 @@ export async function POST(req) {
 
       if (error) {
         return NextResponse.json({
-          sucess: false,
+          success: false,
           message: error.details[0].message,
         });
       }
@@ -57,12 +57,12 @@ export async function POST(req) {
 
       if (newlyCreatedProduct) {
         return NextResponse.json({
-          sucess: true,
+          success: true,
           message: "Product created sucessfully",
         });
       } else {
         return NextResponse.json({
-          sucess: false,
+          success: false,
           messgae: "Failed to add the product | Please try again ",
         });
       }

@@ -11,7 +11,6 @@ export const addNewProduct=async(formData)=>{
             body:JSON.stringify(formData)
         })
         const data=await response.json();
-
         return data;
 
     }catch(error){

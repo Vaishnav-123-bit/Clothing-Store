@@ -3,6 +3,10 @@
 import InputComponent from "@/components/FormElements/InputComponent";
 import SelectComponent from "@/components/FormElements/SelectComponent";
 import TileComponent from "@/components/FormElements/TileComponent";
+import ComponentLevelLoader from "@/components/Loader/componentlevel";
+import Notification from "@/components/Notification";
+import { GlobalContext } from "@/context";
+import { addNewProduct } from "@/servies/product";
 import {
   AvailableSizes,
   adminAddProductformControls,
@@ -17,7 +21,8 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { toast } from "react-toastify";
 import { resolve } from "styled-jsx/css";
 
 const app = initializeApp(firebaseConfig);
@@ -66,6 +71,8 @@ const initialFormData = {
 
 export default function AdminAddNewProduct() {
   const [formData, setFormData] = useState(initialFormData);
+  const {componentLevelLoader,
+    setComponentLevelLoader}=useContext(GlobalContext)
 
   async function handleImage(event) {
     console.log(event.target.files);
@@ -96,7 +103,29 @@ export default function AdminAddNewProduct() {
       sizes: cpySizes,
     });
   }
+  async function handleAddProduct() {
+    setComponentLevelLoader({loading:true,id:''})
+    const res=await addNewProduct(formData);
+    console.log(res);
+    if(res && res.success){
+    setComponentLevelLoader({loading:false,id:''});
+    toast.success(res.message,{
+        position:toast.POSITION.TOP_RIGHT
+    })
+    setFormData(initialFormData)
 
+    }else{
+        toast.error(res.message,{
+            position:toast.POSITION.TOP_RIGHT
+        })
+    setComponentLevelLoader({loading:false,id:''})
+    setFormData(initialFormData)
+    
+    }
+    
+  }
+
+ 
   console.log(formData);
   return (
     <div className="w-full mt-0 mr-0 mb-0 ml-0 relative">
@@ -143,11 +172,19 @@ export default function AdminAddNewProduct() {
               />
             ) : null
           )}
-          <button className="uppercase inline-flex w-full items-center justify-center bg-black px-6 py-4 text-lg text-white font-medium tracking-wide ">
-            Add Product
+          <button onClick={handleAddProduct} className="uppercase inline-flex w-full items-center justify-center bg-black px-6 py-4 text-lg text-white font-medium tracking-wide ">
+            
+            {
+                componentLevelLoader && componentLevelLoader.loading?
+                <ComponentLevelLoader
+                text={"Adding Product"}
+                color={'#ffffff'}
+                loading={componentLevelLoader && componentLevelLoader.loading}/>:'Add Product'
+            }
           </button>
         </div>
       </div>
+      <Notification/>
     </div>
   );
 }
