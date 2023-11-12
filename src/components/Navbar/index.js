@@ -5,8 +5,8 @@ import { adminNavOptions, navOptions } from "@/utils";
 import { Fragment, useContext, useEffect } from "react";
 import CommonModal from "../CommonModal";
 import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
-const isAdminView=false;
+import { usePathname, useRouter } from "next/navigation";
+
 
 
 
@@ -50,7 +50,8 @@ function NavItems({ isModalView = false, isAdminView, router }) {
 export default function Navbar() {
   const { showNavModal, setShowNavModal } = useContext(GlobalContext);
   const {user,isAuthUser,setIsAuthUser,setUser}=useContext(GlobalContext);
-  console.log(user,isAuthUser,'navbar');
+  const pathName=usePathname();
+  console.log(pathName);
   const router=useRouter();
   
   function handleLogout(){
@@ -59,6 +60,7 @@ export default function Navbar() {
     Cookies.remove('token')
     localStorage.clear();
   }
+  const isAdminView=pathName.includes('admin-view')
   return (
     <>
       <nav className="bg-white fixed w-full z-20 top-0 left-0 border-b border-gray-200">
@@ -157,14 +159,14 @@ export default function Navbar() {
               </svg>
             </button>
           </div>
-          <NavItems isAdminView={isAdminView} />
+          <NavItems router={router} isAdminView={isAdminView} />
         </div>
       </nav>
       <CommonModal
         showModalTitle={false}
         mainContent={
           <NavItems
-            
+            router={router}
             isModalView={true}
             isAdminView={isAdminView}
           />
