@@ -7,6 +7,7 @@ import ComponentLevelLoader from "@/components/Loader/componentlevel";
 import Notification from "@/components/Notification";
 import { GlobalContext } from "@/context";
 import { addNewProduct } from "@/servies/product";
+
 import {
   AvailableSizes,
   adminAddProductformControls,
@@ -21,9 +22,10 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
+import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
 import { toast } from "react-toastify";
-import { resolve } from "styled-jsx/css";
+import { resolve ,reject} from "styled-jsx/css";
 
 const app = initializeApp(firebaseConfig);
 const storage = getStorage(app, firebaseStorageURL);
@@ -74,6 +76,8 @@ export default function AdminAddNewProduct() {
   const {componentLevelLoader,
     setComponentLevelLoader}=useContext(GlobalContext)
 
+  const router=useRouter();
+
   async function handleImage(event) {
     console.log(event.target.files);
     const extractImageUrl = await helperForUploadingImageTofirebase(
@@ -103,25 +107,11 @@ export default function AdminAddNewProduct() {
       sizes: cpySizes,
     });
   }
+  
   async function handleAddProduct() {
-    setComponentLevelLoader({loading:true,id:''})
     const res=await addNewProduct(formData);
-    console.log(res);
-    if(res && res.success){
-    setComponentLevelLoader({loading:false,id:''});
-    toast.success(res.message,{
-        position:toast.POSITION.TOP_RIGHT
-    })
-    setFormData(initialFormData)
-
-    }else{
-        toast.error(res.message,{
-            position:toast.POSITION.TOP_RIGHT
-        })
-    setComponentLevelLoader({loading:false,id:''})
-    setFormData(initialFormData)
+    console.log(res)
     
-    }
     
   }
 
