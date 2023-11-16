@@ -8,6 +8,8 @@ import Notification from "@/components/Notification";
 import { GlobalContext } from "@/context";
 import { addNewProduct } from "@/servies/product";
 
+
+
 import {
   AvailableSizes,
   adminAddProductformControls,
@@ -22,7 +24,7 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { resolve ,reject} from "styled-jsx/css";
@@ -75,7 +77,7 @@ export default function AdminAddNewProduct() {
   const [formData, setFormData] = useState(initialFormData);
   const {componentLevelLoader,
     setComponentLevelLoader}=useContext(GlobalContext)
-
+  
   const router=useRouter();
 
   async function handleImage(event) {
@@ -91,6 +93,7 @@ export default function AdminAddNewProduct() {
       });
     }
   }
+  console.log(formData)
 
   function handleTileClick(getCurrentItem) {
     let cpySizes = [...formData.sizes];
@@ -107,13 +110,32 @@ export default function AdminAddNewProduct() {
       sizes: cpySizes,
     });
   }
-  
   async function handleAddProduct() {
-    const res=await addNewProduct(formData);
+    setComponentLevelLoader({loading:true,id:''})
+    const res =await addNewProduct(formData)
     console.log(res)
-    
-    
-  }
+    if(res.success){
+      setComponentLevelLoader({loading:false,id:''})
+      toast.success(res.message,{
+        position:toast.POSITION.TOP_RIGHT
+      })
+
+      setFormData(initialFormData)
+      setTimeout(()=>{
+        router.push('/admin-view/all-products')
+      },1000)
+    }else{
+      toast.error(res.message,{
+      position:toast.POSITION.TOP_RIGHT
+
+    })
+    setComponentLevelLoader({loading:false,id:''})
+    setFormData(initialFormData)
+    }}
+ 
+  
+
+  
 
  
   console.log(formData);
@@ -132,10 +154,11 @@ export default function AdminAddNewProduct() {
             <label>Available sizes</label>
             <TileComponent selected={formData.sizes}  onClick={handleTileClick} data={AvailableSizes} />
           </div>
-          {adminAddProductformControls.map((controlItem, index) =>
+          {adminAddProductformControls.map((controlItem,id) =>
             controlItem.componentType === "input" ? (
               <InputComponent
-                key={index}
+                key={id}
+                
                 type={controlItem.type}
                 label={controlItem.label}
                 placeholder={controlItem.placeholder}
@@ -149,15 +172,16 @@ export default function AdminAddNewProduct() {
               />
             ) : controlItem.componentType === "select" ? (
               <SelectComponent
-                key={index}
+                
                 label={controlItem.label}
                 options={controlItem.options}
+                key={id}
                 value={formData[controlItem.id]}
-                onChange={(event) => {
+                onChange={(event)=>{
                   setFormData({
                     ...formData,
-                    [controlItem.id]: event.target.value,
-                  });
+                    [controlItem.id]:event.target.value
+                  })
                 }}
               />
             ) : null
@@ -178,3 +202,4 @@ export default function AdminAddNewProduct() {
     </div>
   );
 }
+

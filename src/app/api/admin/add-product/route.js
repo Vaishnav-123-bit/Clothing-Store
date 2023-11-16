@@ -19,72 +19,54 @@ const AddNewProductSchema = Joi.object({
 
 export const dynamic = "force-dynamic";
 
-export async function POST(req) {
-  try {
+export async function POST(req){
+  try{
     await connectToDb();
+    const user='admin';
+    if(user==='admin'){
+      const extractData=await req.json()
+      const{
+        name,description,price,category,imageUrl,sizes,deliveryInfo,onSale,priceDrop
 
-    const isAuthUser = 'admin'
+      }=extractData;
 
-    
-
-    if (isAuthUser?.role === "admin") {
-      const extractData = await req.json();
-
-      const {
-        name,
-        description,
-        price,
-        imageUrl,
-        category,
-        sizes,
-        deliveryInfo,
-        onSale,
-        priceDrop,
-      } = extractData;
-
-      const { error } = AddNewProductSchema.validate({
-        name,
-        description,
-        price,
-        imageUrl,
-        category,
-        sizes,
-        deliveryInfo,
-        onSale,
-        priceDrop,
+      const{error}=AddNewProductSchema.validate({
+        name,description,price,category,imageUrl,sizes,deliveryInfo,onSale,priceDrop
       });
 
-      if (error) {
+      if(error){
         return NextResponse.json({
-          success: false,
-          message: error.details[0].message,
-        });
+          success:false,
+          message:error.details[0].message
+        })
       }
 
-      const newlyCreatedProduct = await Product.create(extractData);
-
-      if (newlyCreatedProduct) {
+      const newlyCreatedProduct=await Product.create(extractData);
+      if(newlyCreatedProduct){
         return NextResponse.json({
-          success: true,
-          message: "Product added successfully",
-        });
-      } else {
+          success:true,
+          message:"product added sucessfully"
+        })
+      }else{
         return NextResponse.json({
-          success: false,
-          message: "Failed to add the product ! please try again",
-        });
+          success:false,
+          message:"failed to add product "
+        })
       }
-    } else {
+
+    }else{
       return NextResponse.json({
-        success: false,
-        message: "You are not autorized !",
-      });
+        success:false,
+        message:"you are not authoriized !!"
+      })
     }
-  } catch (error) {
-    console.log(error);
+
+  }catch(error){
+    console.log(error)
     return NextResponse.json({
-      success: false,
-      message: "Something went wrong ! Please try again later",
-    });
+      success:false,
+      message:"Error try again"
+    })
+
   }
 }
