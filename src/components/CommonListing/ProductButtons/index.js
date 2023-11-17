@@ -16,10 +16,11 @@ export default function ProductButton({item}) {
 
 
   async function handleDeleteProduct(item) {
+    setComponentLevelLoader({ loading: true, id: item._id })
     const res = await deleteAProduct(item._id);
     
     if (res.success){
-      setComponentLevelLoader({ loading: true, id: item._id });
+      setComponentLevelLoader({ loading: false, id: '' });
       toast.success(res.message, {
         position: toast.POSITION.TOP_RIGHT,
       });
