@@ -62,7 +62,7 @@ export default function ProductButton({item}) {
     </>
   ) : (
     <>
-      <button className="px-5 py-3 mt-1.5 flex w-full justify-center bg-black text-xs tracking-wide text-white uppercase font-medium"></button>
+      <button className="px-5 py-3 mt-1.5 flex w-full justify-center bg-black text-xs tracking-wide text-white uppercase font-medium">Add to Cart</button>
     </>
   );
 }

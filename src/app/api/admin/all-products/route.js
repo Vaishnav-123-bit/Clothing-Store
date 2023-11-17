@@ -7,9 +7,7 @@ export const dynamic = "force-dynamic";
 export async function GET(req) {
   try {
     await connectToDb();
-    const user = "admin";
-
-    if (user === "admin") {
+    
       const extractAllProducts = await Product.find({});
 
       if (extractAllProducts) {
@@ -24,12 +22,7 @@ export async function GET(req) {
           message: "No products found",
         });
       }
-    } else {
-      return NextResponse.json({
-        success: false,
-        message: "You are not authorized !!",
-      });
-    }
+     
   } catch (error) {
     console.log(error);
     return NextResponse.json({
