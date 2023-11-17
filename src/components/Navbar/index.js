@@ -49,11 +49,17 @@ function NavItems({ isModalView = false, isAdminView, router }) {
 
 export default function Navbar() {
   const { showNavModal, setShowNavModal } = useContext(GlobalContext);
-  const {user,isAuthUser,setIsAuthUser,setUser}=useContext(GlobalContext);
+  const {user,isAuthUser,setIsAuthUser,setUser,currentUpdatedProduct,setCurrentUpdatedProduct}=useContext(GlobalContext);
   const pathName=usePathname();
-  console.log(pathName);
+  console.log(currentUpdatedProduct,'navbar')
+  
   const router=useRouter();
   
+useEffect(()=>{
+  if(pathName!=='/admin-view/add-product' && currentUpdatedProduct !==null )setCurrentUpdatedProduct(null)
+},[pathName])
+
+
   function handleLogout(){
     setIsAuthUser(false);
     setUser(null);

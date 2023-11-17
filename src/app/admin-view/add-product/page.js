@@ -6,7 +6,7 @@ import TileComponent from "@/components/FormElements/TileComponent";
 import ComponentLevelLoader from "@/components/Loader/componentlevel";
 import Notification from "@/components/Notification";
 import { GlobalContext } from "@/context";
-import { addNewProduct } from "@/servies/product";
+import { addNewProduct, updateProduct } from "@/servies/product";
 
 
 
@@ -25,7 +25,7 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import { usePathname, useRouter } from "next/navigation";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { resolve ,reject} from "styled-jsx/css";
 
@@ -76,9 +76,15 @@ const initialFormData = {
 export default function AdminAddNewProduct() {
   const [formData, setFormData] = useState(initialFormData);
   const {componentLevelLoader,
-    setComponentLevelLoader}=useContext(GlobalContext)
+    setComponentLevelLoader,currentUpdatedProduct,setCurrentUpdatedProduct}=useContext(GlobalContext)
   
+
+    console.log(currentUpdatedProduct)
   const router=useRouter();
+
+  useEffect(()=>{
+    if(currentUpdatedProduct !==null)setFormData(currentUpdatedProduct)
+  },[currentUpdatedProduct])
 
   async function handleImage(event) {
     console.log(event.target.files);
@@ -112,7 +118,7 @@ export default function AdminAddNewProduct() {
   }
   async function handleAddProduct() {
     setComponentLevelLoader({loading:true,id:''})
-    const res =await addNewProduct(formData)
+    const res =currentUpdatedProduct!==null ? await updateProduct(formData): await addNewProduct(formData)
     console.log(res)
     if(res.success){
       setComponentLevelLoader({loading:false,id:''})
@@ -121,6 +127,7 @@ export default function AdminAddNewProduct() {
       })
 
       setFormData(initialFormData)
+      setCurrentUpdatedProduct(null)
       setTimeout(()=>{
         router.push('/admin-view/all-products')
       },1000)
@@ -152,13 +159,16 @@ export default function AdminAddNewProduct() {
 
           <div className="flex gap-2 flex-col ">
             <label>Available sizes</label>
-            <TileComponent selected={formData.sizes}  onClick={handleTileClick} data={AvailableSizes} />
+            <TileComponent
+              selected={formData.sizes}
+              onClick={handleTileClick}
+              data={AvailableSizes}
+            />
           </div>
-          {adminAddProductformControls.map((controlItem,id) =>
+          {adminAddProductformControls.map((controlItem, id) =>
             controlItem.componentType === "input" ? (
               <InputComponent
                 key={id}
-                
                 type={controlItem.type}
                 label={controlItem.label}
                 placeholder={controlItem.placeholder}
@@ -172,33 +182,38 @@ export default function AdminAddNewProduct() {
               />
             ) : controlItem.componentType === "select" ? (
               <SelectComponent
-                
                 label={controlItem.label}
                 options={controlItem.options}
                 key={id}
                 value={formData[controlItem.id]}
-                onChange={(event)=>{
+                onChange={(event) => {
                   setFormData({
                     ...formData,
-                    [controlItem.id]:event.target.value
-                  })
+                    [controlItem.id]: event.target.value,
+                  });
                 }}
               />
             ) : null
           )}
-          <button onClick={handleAddProduct} className="uppercase inline-flex w-full items-center justify-center bg-black px-6 py-4 text-lg text-white font-medium tracking-wide ">
-            
-            {
-                componentLevelLoader && componentLevelLoader.loading?
-                <ComponentLevelLoader
-                text={"Adding Product"}
-                color={'#ffffff'}
-                loading={componentLevelLoader && componentLevelLoader.loading}/>:'Add Product'
-            }
+          <button
+            onClick={handleAddProduct}
+            className="uppercase inline-flex w-full items-center justify-center bg-black px-6 py-4 text-lg text-white font-medium tracking-wide "
+          >
+            {componentLevelLoader && componentLevelLoader.loading ? (
+              <ComponentLevelLoader
+                text={currentUpdatedProduct!==null ?"Updating Product ":"Adding Product"}
+                color={"#ffffff"}
+                loading={componentLevelLoader && componentLevelLoader.loading}
+              />
+            ) : currentUpdatedProduct !== null ? (
+              "Update product"
+            ) : (
+              "Add Product"
+            )}
           </button>
         </div>
       </div>
-      <Notification/>
+      <Notification />
     </div>
   );
 }
