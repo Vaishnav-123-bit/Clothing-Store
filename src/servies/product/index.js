@@ -59,7 +59,7 @@ export const deleteAProduct=async(id)=>{
 
     })
 
-    const data=await req.json();
+    const data=await res.json();
     return data;
 
   }catch(e){
