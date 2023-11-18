@@ -3,58 +3,56 @@ import Product from "@/models/product";
 import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
-
 export async function PUT(req) {
   try {
-    await connectToDb();
-    const extarctData = await req.json();
+    await connectToDb()
+    const extractData=await req.json();
     const {
       _id,
       name,
       price,
       description,
+      category,
       sizes,
       deliveryInfo,
-      priceDrop,
       onSale,
+      priceDrop,
       imageUrl,
-      category,
-    } = extarctData;
+    } = extractData;
 
     const updatedProduct = await Product.findOneAndUpdate(
-        {
-          _id: _id,
-        },
-        {
-          name,
-          price,
-          description,
-          category,
-          sizes,
-          deliveryInfo,
-          onSale,
-          priceDrop,
-          imageUrl,
-        },
-        { new: true }
-      );
-
+      {
+        _id: _id,
+      },
+      {
+        name,
+        price,
+        description,
+        category,
+        sizes,
+        deliveryInfo,
+        onSale,
+        priceDrop,
+        imageUrl,
+      },
+      { new: true }
+    );
     if(updatedProduct){
-        return NextResponse.json({
-            success:true,
-            message:"Product updated successfully !! "
-        })
+      return NextResponse.json({
+        success:true,
+        message:"Product updated successfully "
+      })
     }else{
-        return NextResponse.json({
-            success:false,
-            message:"Failed to update | Try again "
-        })
+      return NextResponse.json({
+        success:false,
+        message:"Error Failed to update"
+      })
     }
-  } catch (error) {
-    console.log(error);
+  } catch (e) {
+    console.log(e);
     return NextResponse.json({
       success: false,
-      message: "Something went wrong | Try again",
+      message: "Try again",
     });
   }
 }

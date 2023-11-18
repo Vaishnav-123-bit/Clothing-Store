@@ -51,7 +51,7 @@ export default function Navbar() {
   const { showNavModal, setShowNavModal } = useContext(GlobalContext);
   const {user,isAuthUser,setIsAuthUser,setUser,currentUpdatedProduct,setCurrentUpdatedProduct}=useContext(GlobalContext);
   const pathName=usePathname();
-  console.log(currentUpdatedProduct,'navbar')
+  
   
   const router=useRouter();
   
@@ -59,7 +59,7 @@ useEffect(()=>{
   if(pathName!=='/admin-view/add-product' && currentUpdatedProduct !==null )setCurrentUpdatedProduct(null)
 },[pathName])
 
-
+console.log(currentUpdatedProduct,'navbar')
   function handleLogout(){
     setIsAuthUser(false);
     setUser(null);

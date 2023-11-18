@@ -37,7 +37,7 @@ export default function ProductButton({item}) {
       <button
         onClick={() => {
           setCurrentUpdatedProduct(item);
-          router.push("/admin-view/add-product");
+          router.push("/admin-view/add-product")
         }}
         className=" px-5 py-3 mt-1.5 flex w-full justify-center bg-black text-xs tracking-wide text-white uppercase font-medium"
       >
