@@ -21,7 +21,7 @@ export async function GET(req){
             return NextResponse.json({
                 success:false,
                 status:204,
-                messgae:"Error "
+                messgae:"No products found "
             })
         }
     }catch(e){
