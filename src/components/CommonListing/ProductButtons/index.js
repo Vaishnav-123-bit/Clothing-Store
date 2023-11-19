@@ -3,25 +3,29 @@
 import ComponentLevelLoader from "@/components/Loader/componentlevel";
 import { GlobalContext } from "@/context";
 import { addToCart } from "@/servies/cart";
+
 import { deleteAProduct } from "@/servies/product";
 import { usePathname, useRouter } from "next/navigation";
 import { useContext } from "react";
 import { toast } from "react-toastify";
 
-export default function ProductButton({item}) {
+export default function ProductButton({ item }) {
   const pathName = usePathname();
   const isAdminView = pathName.includes("admin-view");
-  const{componentLevelLoader,setCurrentUpdatedProduct,setComponentLevelLoader,user}=useContext(GlobalContext);
-  const router=useRouter();
-
-
+  const {showCartModal,setShowCartModal,
+    componentLevelLoader,
+    setCurrentUpdatedProduct,
+    setComponentLevelLoader,
+    user,
+  } = useContext(GlobalContext);
+  const router = useRouter();
 
   async function handleDeleteProduct(item) {
-    setComponentLevelLoader({ loading: true, id: item._id })
+    setComponentLevelLoader({ loading: true, id: item._id });
     const res = await deleteAProduct(item._id);
-    
-    if (res.success){
-      setComponentLevelLoader({ loading: false, id: '' });
+
+    if (res.success) {
+      setComponentLevelLoader({ loading: false, id: "" });
       toast.success(res.message, {
         position: toast.POSITION.TOP_RIGHT,
       });
@@ -33,18 +37,32 @@ export default function ProductButton({item}) {
       setComponentLevelLoader({ loading: false, id: "" });
     }
   }
-
-  async function handleAddToCart(getItem){
+  async function handleAddToCart(getItem) {
+    setComponentLevelLoader({ loading: true, id: getItem._id });
     const res = await addToCart({ productID: getItem._id, userID: user._id });
-
-    console.log(res)
+    if (res.success) {
+      toast.success(res.message, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      setComponentLevelLoader({ loading: false, id: "" });
+      setShowCartModal(true)
+    } else {
+      toast.error(res.message, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      setComponentLevelLoader({ loading: false, id: "" });
+      setShowCartModal(true)
+      
+    }
+    console.log(res);
   }
+
   return isAdminView ? (
     <>
       <button
         onClick={() => {
           setCurrentUpdatedProduct(item);
-          router.push("/admin-view/add-product")
+          router.push("/admin-view/add-product");
         }}
         className=" px-5 py-3 mt-1.5 flex w-full justify-center bg-black text-xs tracking-wide text-white uppercase font-medium"
       >
@@ -69,7 +87,20 @@ export default function ProductButton({item}) {
     </>
   ) : (
     <>
-      <button onClick={()=>handleAddToCart(item)} className="px-5 py-3 mt-1.5 flex w-full justify-center bg-black text-xs tracking-wide text-white uppercase font-medium">Add to Cart</button>
+      <button
+        onClick={() => handleAddToCart(item)}
+        className="px-5 py-3 mt-1.5 flex w-full justify-center bg-black text-xs tracking-wide text-white uppercase font-medium"
+      >
+        {componentLevelLoader && componentLevelLoader.id === item._id ? (
+          <ComponentLevelLoader
+            text={"Adding to Cart"}
+            color={"#ffffff"}
+            loading={componentLevelLoader && componentLevelLoader.loading}
+          />
+        ) : (
+          "Add to Cart"
+        )}
+      </button>
     </>
   );
 }

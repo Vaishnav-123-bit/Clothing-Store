@@ -12,7 +12,7 @@ export default function GlobalState({ children }) {
   const [isAuthUser, setIsAuthUser] = useState(null);
   const [user, setUser] = useState(null);
   const[currentUpdatedProduct,setCurrentUpdatedProduct]=useState(null)
-  
+  const[showCartModal,setShowCartModal]=useState(false)
   useEffect(()=>{
     console.log(Cookies.get('token'));
 
@@ -27,7 +27,7 @@ export default function GlobalState({ children }) {
   },[Cookies])
 
   return (
-    <GlobalContext.Provider value={{currentUpdatedProduct,setCurrentUpdatedProduct, showNavModal, setShowNavModal,user,setUser,isAuthUser,setIsAuthUser ,pageLevelLoader,setPageLevelLoader,componentLevelLoader,setComponentLevelLoader}}>
+    <GlobalContext.Provider value={{currentUpdatedProduct,setCurrentUpdatedProduct, showNavModal, setShowNavModal,user,setUser,isAuthUser,setIsAuthUser ,pageLevelLoader,setPageLevelLoader,componentLevelLoader,setComponentLevelLoader,showCartModal,setShowCartModal}}>
       {children}
     </GlobalContext.Provider>
   );
