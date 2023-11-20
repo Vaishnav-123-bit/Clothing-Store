@@ -10,19 +10,21 @@ export async function GET(req) {
   try {
     await connectToDb();
 
-    const isAuthUser = await AuthUser(req);
+    const user = await AuthUser(req);
 
-    if (isAuthUser) {
+    if (user) {
+      const userID = user.id;
       const { searchParams } = new URL(req.url);
       const id = searchParams.get("id");
-
+      console.log(id)
+      
       if (!id)
         return NextResponse.json({
           success: false,
           message: "Please login in!",
         });
       const extractAllCartItems = await Cart.find({ userID: id }).populate(
-        "productID"
+        productID
       );
 
       if (extractAllCartItems) {
