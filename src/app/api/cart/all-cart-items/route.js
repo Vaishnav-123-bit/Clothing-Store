@@ -11,6 +11,7 @@ export async function GET(req) {
     await connectToDb();
 
     const user = await AuthUser(req);
+    
 
     if (user) {
       const userID = user.id;
