@@ -6,7 +6,7 @@ import { Fragment, useContext, useEffect } from "react";
 import CommonModal from "../CommonModal";
 import Cookies from "js-cookie";
 import { usePathname, useRouter } from "next/navigation";
-import CartModal from "../CartModal";
+
 
 
 
@@ -181,9 +181,7 @@ console.log(currentUpdatedProduct,'navbar')
         show={showNavModal}
         setShow={setShowNavModal}
       />
-      {
-        showCartModal && <CartModal/>
-      }
+    
       
     </>
   );

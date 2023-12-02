@@ -25,7 +25,7 @@ export async function POST(req){
     await connectToDb();
     
     const isAuthUser=await AuthUser(req)
-    console.log(isAuthUser,"alaooo")
+    console.log(isAuthUser)
     if(isAuthUser?.role==='admin'){
       const extractData=await req.json()
       const{
