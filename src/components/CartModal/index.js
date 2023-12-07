@@ -3,10 +3,12 @@
 import { Fragment, useContext, useEffect } from "react";
 import CommonModal from "../CommonModal";
 import { GlobalContext } from "@/context";
-import { getAllCartItems } from "@/servies/cart";
+import { deleteFromCart, getAllCartItems } from "@/servies/cart";
+import { toast } from "react-toastify";
+import ComponentLevelLoader from "../Loader/componentlevel";
 
 export default function CartModal() {
-  const { cartItems, setCartItems, showCartModal, setShowCartModal, user } =
+  const { componentLevelLoader,setComponentLevelLoader,cartItems, setCartItems, showCartModal, setShowCartModal, user } =
     useContext(GlobalContext);
 
   async function extractAllCartItems() {
@@ -22,6 +24,22 @@ export default function CartModal() {
   useEffect(() => {
     if (user !== null) extractAllCartItems();
   }, [user]);
+  async function handleDeleteCartItem(getCartItemID){
+    setComponentLevelLoader({loading:true,id:getCartItemID})
+    const res =await deleteFromCart(getCartItemID)
+    if(res.success){
+      setComponentLevelLoader({loading:false,id:''})
+      toast.success(res.message,{
+        position:toast.POSITION.TOP_RIGHT
+      })
+      extractAllCartItems()
+    }else{
+      setComponentLevelLoader({loading:false,id:getCartItemID})
+      toast.error(res.message,{
+        position:toast.POSITION.TOP_RIGHT
+      })
+    }
+  }
   return (
     <CommonModal
       showButtons={true}
@@ -64,9 +82,19 @@ export default function CartModal() {
                   <div className="flex flex-1 items-end justify-between text-sm">
                     <button
                       type="button"
+                      onClick={()=>handleDeleteCartItem(cartItem._id)}
                       className="font-medium text-yellow-600 sm:order-2"
                     >
-                      Remove
+                     {
+                      componentLevelLoader && componentLevelLoader.loading 
+                      && componentLevelLoader.id ===cartItem._id ?
+                      <ComponentLevelLoader
+                      text={"Removing from Cart"}
+                      color={"#000000"}
+                      loading={componentLevelLoader && componentLevelLoader.loading}
+
+                      />:'Remove'
+                     }
                     </button>
                   </div>
                 </div>
