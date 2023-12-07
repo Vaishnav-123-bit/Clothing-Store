@@ -39,22 +39,22 @@ export default function ProductButton({ item }) {
     }
   }
   async function handleAddToCart(getItem) {
-    // setComponentLevelLoader({ loading: true, id: getItem._id });
+    setComponentLevelLoader({ loading: true, id: getItem._id });
     const res = await addToCart({ productID: getItem._id, userID: user._id });
-    // if (res.success) {
-    //   toast.success(res.message, {
-    //     position: toast.POSITION.TOP_RIGHT,
-    //   });
-    //   setComponentLevelLoader({ loading: false, id: "" });
-    //   setShowCartModal(true)
-    // } else {
-    //   toast.error(res.message, {
-    //     position: toast.POSITION.TOP_RIGHT,
-    //   });
-    //   setComponentLevelLoader({ loading: false, id: "" });
-    //   setShowCartModal(true)
+     if (res.success) {
+       toast.success(res.message, {
+         position: toast.POSITION.TOP_RIGHT,
+       });
+       setComponentLevelLoader({ loading: false, id: "" });
+       setShowCartModal(true)
+     } else {
+       toast.error(res.message, {
+         position: toast.POSITION.TOP_RIGHT,
+       });
+       setComponentLevelLoader({ loading: false, id: "" });
+       setShowCartModal(true)
       
-    // }
+     }
     console.log(res);
   }
 
