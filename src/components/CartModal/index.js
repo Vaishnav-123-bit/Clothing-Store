@@ -6,10 +6,13 @@ import { GlobalContext } from "@/context";
 import { deleteFromCart, getAllCartItems } from "@/servies/cart";
 import { toast } from "react-toastify";
 import ComponentLevelLoader from "../Loader/componentlevel";
+import { useRouter } from "next/navigation";
+
 
 export default function CartModal() {
   const { componentLevelLoader,setComponentLevelLoader,cartItems, setCartItems, showCartModal, setShowCartModal, user } =
     useContext(GlobalContext);
+    const router=useRouter()
 
   async function extractAllCartItems() {
     const res = await getAllCartItems(user?._id);
@@ -105,7 +108,12 @@ export default function CartModal() {
       }
       buttonComponent={
         <Fragment>
-          <button className="w-full mt-1.5 trackiing-wide inline-block bg-black text-white px-5 py-3 text-xs font-medium uppercase">Go To Cart</button>
+          <button
+          
+          onClick={()=>{
+            router.push('/cart')
+            setShowCartModal(false)
+           }} className="w-full mt-1.5 trackiing-wide inline-block bg-black text-white px-5 py-3 text-xs font-medium uppercase">Go To Cart</button>
           <button disabled={cartItems && cartItems.length ===0 } type="button" className="w-full disabled:opacity-50 mt-1.5 trackiing-wide inline-block bg-black text-white px-5 py-3 text-xs font-medium uppercase">Checkout</button>
           <div className="mt-6 flex text-sm text-center text-gray-600 justify-center">
             <button type="button" className="font-medium text-gray">

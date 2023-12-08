@@ -62,7 +62,7 @@ export default function CommmonCart({ cartItems = [],handleDeleteCartItem,compon
                       </li>
                     ))}
                   </ul>
-                ) : null}
+                ) : <h1 className="font-bold text-lg">Your cart is Empty !</h1> }
               </div>
               <div className="mt-6 border-t border-b py-2">
                 <div className="flex items-center justify-between">
@@ -97,7 +97,7 @@ export default function CommmonCart({ cartItems = [],handleDeleteCartItem,compon
                 </div>
 
                 <div className="mt-5 text-center">
-                  <button className="group inline-flex w-full items-center justify-center bg-black px-6 py-4 text-white font-medium uppercase tracking-wide">
+                  <button disabled={cartItems && cartItems.length===0} className="disabled:opacity-50 group inline-flex w-full items-center justify-center bg-black px-6 py-4 text-white font-medium uppercase tracking-wide">
                     CheckOut
                   </button>
                 </div>

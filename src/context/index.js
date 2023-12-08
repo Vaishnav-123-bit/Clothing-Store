@@ -15,6 +15,12 @@ export default function GlobalState({ children }) {
   const[showCartModal,setShowCartModal]=useState(false)
   const[cartItems,setCartItems]=useState([])
   
+const[addresses,setAddresses]=useState([]);
+const[addressFormData,setAddressFormData]=useState({
+  fullName:'',city:'',country:'',postalCode:'',address:''
+})
+
+
   useEffect(()=>{
     console.log(Cookies.get('token'));
 
@@ -29,7 +35,7 @@ export default function GlobalState({ children }) {
   },[Cookies])
 
   return (
-    <GlobalContext.Provider value={{cartItems,setCartItems,currentUpdatedProduct,setCurrentUpdatedProduct, showNavModal, setShowNavModal,user,setUser,isAuthUser,setIsAuthUser ,pageLevelLoader,setPageLevelLoader,componentLevelLoader,setComponentLevelLoader,showCartModal,setShowCartModal}}>
+    <GlobalContext.Provider value={{addresses,setAddresses,addressFormData,setAddressFormData,cartItems,setCartItems,currentUpdatedProduct,setCurrentUpdatedProduct, showNavModal, setShowNavModal,user,setUser,isAuthUser,setIsAuthUser ,pageLevelLoader,setPageLevelLoader,componentLevelLoader,setComponentLevelLoader,showCartModal,setShowCartModal}}>
       {children}
     </GlobalContext.Provider>
   );
