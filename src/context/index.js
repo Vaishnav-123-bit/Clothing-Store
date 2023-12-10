@@ -4,6 +4,16 @@ import { createContext, useEffect, useState } from "react";
 
 export const GlobalContext = createContext(null);
 
+export const initialCheckoutFormData={
+  shippingAddress:{},
+  payementMethod:'',
+  totalPrice:0,
+  isPaid:false,
+  paidAt:new Date(),
+  isProcessing:true
+
+}
+
 export default function GlobalState({ children }) {
   const [showNavModal, setShowNavModal] = useState(false);
   
@@ -19,6 +29,8 @@ const[addresses,setAddresses]=useState([]);
 const[addressFormData,setAddressFormData]=useState({
   fullName:'',city:'',country:'',postalCode:'',address:''
 })
+
+const[checkoutFormData,setCheckoutFormData]=useState(initialCheckoutFormData)
 
 
   useEffect(()=>{
@@ -37,7 +49,7 @@ const[addressFormData,setAddressFormData]=useState({
   },[Cookies])
 
   return (
-    <GlobalContext.Provider value={{addresses,setAddresses,addressFormData,setAddressFormData,cartItems,setCartItems,currentUpdatedProduct,setCurrentUpdatedProduct, showNavModal, setShowNavModal,user,setUser,isAuthUser,setIsAuthUser ,pageLevelLoader,setPageLevelLoader,componentLevelLoader,setComponentLevelLoader,showCartModal,setShowCartModal}}>
+    <GlobalContext.Provider value={{checkoutFormData,setCheckoutFormData,addresses,setAddresses,addressFormData,setAddressFormData,cartItems,setCartItems,currentUpdatedProduct,setCurrentUpdatedProduct, showNavModal, setShowNavModal,user,setUser,isAuthUser,setIsAuthUser ,pageLevelLoader,setPageLevelLoader,componentLevelLoader,setComponentLevelLoader,showCartModal,setShowCartModal}}>
       {children}
     </GlobalContext.Provider>
   );

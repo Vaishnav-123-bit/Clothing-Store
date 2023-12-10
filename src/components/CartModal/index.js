@@ -8,11 +8,17 @@ import { toast } from "react-toastify";
 import ComponentLevelLoader from "../Loader/componentlevel";
 import { useRouter } from "next/navigation";
 
-
 export default function CartModal() {
-  const { componentLevelLoader,setComponentLevelLoader,cartItems, setCartItems, showCartModal, setShowCartModal, user } =
-    useContext(GlobalContext);
-    const router=useRouter()
+  const {
+    componentLevelLoader,
+    setComponentLevelLoader,
+    cartItems,
+    setCartItems,
+    showCartModal,
+    setShowCartModal,
+    user,
+  } = useContext(GlobalContext);
+  const router = useRouter();
 
   async function extractAllCartItems() {
     const res = await getAllCartItems(user?._id);
@@ -27,20 +33,20 @@ export default function CartModal() {
   useEffect(() => {
     if (user !== null) extractAllCartItems();
   }, [user]);
-  async function handleDeleteCartItem(getCartItemID){
-    setComponentLevelLoader({loading:true,id:getCartItemID})
-    const res =await deleteFromCart(getCartItemID)
-    if(res.success){
-      setComponentLevelLoader({loading:false,id:''})
-      toast.success(res.message,{
-        position:toast.POSITION.TOP_RIGHT
-      })
-      extractAllCartItems()
-    }else{
-      setComponentLevelLoader({loading:false,id:getCartItemID})
-      toast.error(res.message,{
-        position:toast.POSITION.TOP_RIGHT
-      })
+  async function handleDeleteCartItem(getCartItemID) {
+    setComponentLevelLoader({ loading: true, id: getCartItemID });
+    const res = await deleteFromCart(getCartItemID);
+    if (res.success) {
+      setComponentLevelLoader({ loading: false, id: "" });
+      toast.success(res.message, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
+      extractAllCartItems();
+    } else {
+      setComponentLevelLoader({ loading: false, id: getCartItemID });
+      toast.error(res.message, {
+        position: toast.POSITION.TOP_RIGHT,
+      });
     }
   }
   return (
@@ -85,19 +91,22 @@ export default function CartModal() {
                   <div className="flex flex-1 items-end justify-between text-sm">
                     <button
                       type="button"
-                      onClick={()=>handleDeleteCartItem(cartItem._id)}
+                      onClick={() => handleDeleteCartItem(cartItem._id)}
                       className="font-medium text-yellow-600 sm:order-2"
                     >
-                     {
-                      componentLevelLoader && componentLevelLoader.loading 
-                      && componentLevelLoader.id ===cartItem._id ?
-                      <ComponentLevelLoader
-                      text={"Removing from Cart"}
-                      color={"#000000"}
-                      loading={componentLevelLoader && componentLevelLoader.loading}
-
-                      />:'Remove'
-                     }
+                      {componentLevelLoader &&
+                      componentLevelLoader.loading &&
+                      componentLevelLoader.id === cartItem._id ? (
+                        <ComponentLevelLoader
+                          text={"Removing from Cart"}
+                          color={"#000000"}
+                          loading={
+                            componentLevelLoader && componentLevelLoader.loading
+                          }
+                        />
+                      ) : (
+                        "Remove"
+                      )}
                     </button>
                   </div>
                 </div>
@@ -109,15 +118,28 @@ export default function CartModal() {
       buttonComponent={
         <Fragment>
           <button
-          
-          onClick={()=>{
-            router.push('/cart')
-            setShowCartModal(false)
-           }} className="w-full mt-1.5 trackiing-wide inline-block bg-black text-white px-5 py-3 text-xs font-medium uppercase">Go To Cart</button>
-          <button disabled={cartItems && cartItems.length ===0 } type="button" className="w-full disabled:opacity-50 mt-1.5 trackiing-wide inline-block bg-black text-white px-5 py-3 text-xs font-medium uppercase">Checkout</button>
+            onClick={() => {
+              router.push("/cart");
+              setShowCartModal(false);
+            }}
+            className="w-full mt-1.5 trackiing-wide inline-block bg-black text-white px-5 py-3 text-xs font-medium uppercase"
+          >
+            Go To Cart
+          </button>
+          <button
+            onClick={() => {
+              router.push("/checkout");
+              setShowCartModal(false);
+            }}
+            disabled={cartItems && cartItems.length === 0}
+            type="button"
+            className="w-full disabled:opacity-50 mt-1.5 trackiing-wide inline-block bg-black text-white px-5 py-3 text-xs font-medium uppercase"
+          >
+            Checkout
+          </button>
           <div className="mt-6 flex text-sm text-center text-gray-600 justify-center">
             <button type="button" className="font-medium text-gray">
-                Continue Shopping
+              Continue Shopping
             </button>
             <span aria-hidden="true">&rarr;</span>
           </div>
