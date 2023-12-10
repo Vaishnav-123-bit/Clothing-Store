@@ -45,7 +45,7 @@ export default function Checkout() {
                       {item && item.productID && item.productID.name}
                     </span>
                     <span className="font-semibold">
-                      {item && item.productID && item.productID.price}
+                      Rs {item && item.productID && item.productID.price}
                     </span>
                   </div>
                 </div>
