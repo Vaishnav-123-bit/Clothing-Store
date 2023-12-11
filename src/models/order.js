@@ -5,10 +5,10 @@ import User from "../models/user.js";
 const OrderSchema = new mongoose.Schema(
   {
     user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // Assuming your user model is named 'User'
+    required: true,
+  },
     orderItems: [
       {
         qty: { type: Number, required: true },
