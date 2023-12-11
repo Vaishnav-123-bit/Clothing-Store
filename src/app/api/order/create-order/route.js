@@ -2,6 +2,8 @@
 import connectToDb from "@/database";
 import AuthUser from "@/middleware/AuthUser";
 import Cart from "@/models/cart";
+
+
 import Order from "@/models/order";
 import { NextResponse } from "next/server";
 
@@ -12,15 +14,15 @@ export async function POST(req) {
     await connectToDb();
     const isAuthUser = await AuthUser(req);
 
-    console.log("isAuthUser:", isAuthUser);
+   
 
     if (isAuthUser) {
       const data = await req.json();
 
-      console.log("from data", data);
+      
 
       const user = isAuthUser.id;
-      console.log("user:", user);
+      
 
       if (!user) {
         return NextResponse.json({
