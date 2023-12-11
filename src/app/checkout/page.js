@@ -3,8 +3,13 @@
 import Notification from "@/components/Notification";
 import { GlobalContext } from "@/context";
 import { fetchAllAddresses } from "@/servies/address";
-import { useRouter } from "next/navigation";
+import { createNewOrder } from "@/servies/order";
+import { callStripeSession } from "@/servies/stripe";
+import { loadStripe } from "@stripe/stripe-js";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useContext, useEffect, useState } from "react";
+import { PulseLoader } from "react-spinners";
+import { toast } from "react-toastify";
 
 export default function Checkout() {
   const {
@@ -17,7 +22,16 @@ export default function Checkout() {
   } = useContext(GlobalContext);
 
   const [selectedAddress, setSelectedAddress] = useState(null);
+
+  const [isOrderProcessing, setIsOrderProcessing] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(false);
+  const params = useSearchParams();
   const router = useRouter();
+
+  const publishableKey =
+    "pk_test_51OM4cPSFoRoD7dYPVKgb7POqBGmTTtdvhE59R1ORKcKmvYImP0dyAzpGFSqQ9QcE8d4ivzeT2pgWvXAJoQ69lp0300PMmYVyyA";
+  const stripePromise = loadStripe(publishableKey);
+
   console.log(cartItems);
 
   async function getAllAddresses() {
@@ -30,7 +44,58 @@ export default function Checkout() {
     if (user !== null) getAllAddresses();
   }, [user]);
 
-  console.log(addresses);
+  useEffect(() => {
+    async function createFinalOrder() {
+      const isStripe = JSON.parse(localStorage.getItem("stripe"));
+
+      if (
+        isStripe &&
+        params.get("status") === "success" &&
+        cartItems &&
+        cartItems.length > 0
+      ) {
+        setIsOrderProcessing(true);
+        const getCheckoutFormData = JSON.parse(
+          localStorage.getItem("checkoutFormData")
+        );
+
+        const createFinalCheckoutFormData = {
+          user: user?._id,
+          shippingAddress: getCheckoutFormData.shippingAddress,
+          orderItems: cartItems.map((item) => ({
+            qty: 1,
+            product: item.productID,
+          })),
+          paymentMethod: "Stripe",
+          totalPrice: cartItems.reduce(
+            (total, item) => item.productID.price + total,
+            0
+          ),
+          isPaid: true,
+          isProcessing: true,
+          paidAt: new Date(),
+        };
+
+        const res = await createNewOrder(createFinalCheckoutFormData);
+
+        if (res.success) {
+          setIsOrderProcessing(false);
+          setOrderSuccess(true);
+          toast.success(res.message, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+        } else {
+          setIsOrderProcessing(false);
+          setOrderSuccess(false);
+          toast.error(res.message, {
+            position: toast.POSITION.TOP_RIGHT,
+          });
+        }
+      }
+    }
+
+    createFinalOrder();
+  }, [params.get("status"), cartItems]);
 
   function handleSelectedAddress(getAddress) {
     if (getAddress._id === selectedAddress) {
@@ -54,7 +119,98 @@ export default function Checkout() {
       },
     });
   }
-  console.log(checkoutFormData)
+
+  async function handleCheckout() {
+    const stripe = await stripePromise;
+
+    const createLineItems = cartItems.map((item) => ({
+      price_data: {
+        currency: "usd",
+        product_data: {
+          images: [item.productID.imageUrl],
+          name: item.productID.name,
+        },
+        unit_amount: item.productID.price * 100,
+      },
+      quantity: 1,
+    }));
+
+    const res = await callStripeSession(createLineItems);
+    setIsOrderProcessing(true);
+    localStorage.setItem("stripe", true);
+    localStorage.setItem("checkoutFormData", JSON.stringify(checkoutFormData));
+
+    const { error } = await stripe.redirectToCheckout({
+      sessionId: res.id,
+    });
+
+    console.log(error);
+  }
+
+  useEffect(() => {
+    if (orderSuccess) {
+      setTimeout(() => {
+        // setOrderSuccess(false);
+        router.push("/orders");
+      }, [2000]);
+    }
+  }, [orderSuccess]);
+
+  if (orderSuccess) {
+    return (
+      <section className="h-screen bg-gray-200">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto mt-8 max-w-screen-xl px-4 sm:px-6 lg:px-8 ">
+            <div className="bg-white shadow">
+              <div className="px-4 py-6 sm:px-8 sm:py-10 flex flex-col gap-5">
+                <h1 className="font-bold text-lg">
+                  Your payment is successfull and you will be redirected to
+                  orders page in 2 seconds !
+                </h1>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (isOrderProcessing) {
+    return (
+      <div className="w-full min-h-screen flex justify-center items-center">
+        <PulseLoader
+          color={"#000000"}
+          loading={isOrderProcessing}
+          size={30}
+          data-testid="loader"
+        />
+      </div>
+    );
+  }
+  // async function handleCheckout(){
+  //   const stripe =await stripePromise;
+  //   const createLineItem=cartItems.map(item=>({
+  //     price_data:{
+  //       currency:'usd',
+  //       product_data:{
+  //         images:[item.productID.imageUrl],
+  //         name:item.productID.name
+  //       },
+  //       unit_amount:item.productID.pprice *100
+  //     },
+  //     quantity:1
+  //   }))
+  //   const res=await callStripeSession(createLineItem)
+  //     setIsOrderProcessing(true),
+  //     localStorage.setItem('stripe',true)
+  //     localStorage.setItem('checkoutFormData',JSON.stringify(checkoutFormData));
+
+  //     console.log(res)
+  //     const {error}=await stripe.redirectToCheckout({
+  //       sessionId:res.id,
+  //     });
+  //     console.log(error)
+  // }
   return (
     <div className=" bg-white">
       <div className="grid sm:px-10 lg:grid-cols-2 lg:px-20 xl:px-32">
@@ -155,7 +311,14 @@ export default function Checkout() {
             </div>
 
             <div className="pb-10">
-              <button disabled={cartItems && cartItems.length===0 || Object.keys(checkoutFormData.shippingAddress).length===0} className="disabled:opacity-50 w-full mt-5 mr-5 inline-block bg-black text-white px-5 py-3 text-xs font-medium uppercase tracking-wide">
+              <button
+                onClick={handleCheckout}
+                disabled={
+                  (cartItems && cartItems.length === 0) ||
+                  Object.keys(checkoutFormData.shippingAddress).length === 0
+                }
+                className="disabled:opacity-50 w-full mt-5 mr-5 inline-block bg-black text-white px-5 py-3 text-xs font-medium uppercase tracking-wide"
+              >
                 checkout
               </button>
             </div>
