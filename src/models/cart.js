@@ -21,6 +21,16 @@ const CartItems = new mongoose.Schema(
   }
 );
 
+CartItems.statics.deleteItemsByUserID = async function (userID) {
+  try {
+    await this.deleteMany({ userID: userID });
+    console.log('Cart items deleted successfully');
+  } catch (error) {
+    console.error('Error deleting cart items:', error);
+    throw error;
+  }
+};
+
 
 
 const Cart = mongoose.models.Cart || mongoose.model("Cart", CartItems);

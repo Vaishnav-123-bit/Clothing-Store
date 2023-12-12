@@ -1,5 +1,6 @@
 "use client";
 import Cookies from "js-cookie";
+import { usePathname, useRouter } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
 
 export const GlobalContext = createContext(null);
@@ -16,7 +17,7 @@ export const initialCheckoutFormData={
 
 export default function GlobalState({ children }) {
   const [showNavModal, setShowNavModal] = useState(false);
-  
+  const[allOrdersForUser,setAllOrdersForUser]=useState([])
   const [pageLevelLoader, setPageLevelLoader] = useState(true);
   const[componentLevelLoader,setComponentLevelLoader]=useState({loading:false,id:''})
   const [isAuthUser, setIsAuthUser] = useState(null);
@@ -31,6 +32,24 @@ const[addressFormData,setAddressFormData]=useState({
 })
 
 const[checkoutFormData,setCheckoutFormData]=useState(initialCheckoutFormData)
+const router=useRouter()
+const pathName=usePathname()
+const protectedRoutes=[
+  '/cart',
+  '/checkout',
+  '/account',
+  '/orders',
+  '/admin-view',
+  '/admin-view/add-product',
+  '/admin-view/all-products'
+]
+
+const protectedAdminRoutes=[
+  
+  '/admin-view',
+  '/admin-view/add-product',
+  '/admin-view/all-products'
+]
 
 
   useEffect(()=>{
@@ -44,9 +63,26 @@ const[checkoutFormData,setCheckoutFormData]=useState(initialCheckoutFormData)
         setCartItems(getCartItems)
     }else{
         setIsAuthUser(false);
+        setUser({})
     }
 
   },[Cookies])
+
+
+  useEffect(()=>{
+    if(user && Object.keys(user).length===0 && protectedRoutes.indexOf(pathName) > -1) router.push('/login')
+  },[user,pathName])
+
+  useEffect(() => {
+    if (
+      user !== null &&
+      user &&
+      Object.keys(user).length > 0 &&
+      user?.role !== "admin" &&
+      protectedAdminRoutes.indexOf(pathName) > -1
+    )
+      router.push("/unauthorized-page");
+  }, [user, pathName]);
 
   return (
     <GlobalContext.Provider value={{checkoutFormData,setCheckoutFormData,addresses,setAddresses,addressFormData,setAddressFormData,cartItems,setCartItems,currentUpdatedProduct,setCurrentUpdatedProduct, showNavModal, setShowNavModal,user,setUser,isAuthUser,setIsAuthUser ,pageLevelLoader,setPageLevelLoader,componentLevelLoader,setComponentLevelLoader,showCartModal,setShowCartModal}}>
