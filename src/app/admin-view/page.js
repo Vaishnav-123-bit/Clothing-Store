@@ -5,3 +5,4 @@ export default function AdminView(){
         <div>Admin view</div>
     )
 }
+
