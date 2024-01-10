@@ -5,7 +5,6 @@ import { getAllAdminProducts } from "@/servies/product";
 
 
 
-
 export default async function AdminAllProducts(){
     const allAdminProducts=await getAllAdminProducts()
     console.log(allAdminProducts)
